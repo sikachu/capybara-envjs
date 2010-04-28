@@ -135,6 +135,7 @@ class Capybara::Driver::Envjs < Capybara::Driver::Base
 
   attr_reader :app
   attr_reader :app_host
+  attr_reader :current_url
   attr_accessor :current_host
 
   def rack_test?
@@ -189,12 +190,14 @@ class Capybara::Driver::Envjs < Capybara::Driver::Base
         end
         begin
           # puts "send #{method} #{url} #{params}"
+          current_url! url
           send method, url, params, e
           while response.status == 302
             params = {}
             method = :get
             url = response.location
             # puts "redirect #{method} #{url} #{params}"
+            current_url! url
             send method, url, params, e
           end
         rescue Exception => e
@@ -220,10 +223,6 @@ class Capybara::Driver::Envjs < Capybara::Driver::Base
     browser["window"].location.href = path
   end
 
-  def current_url
-    browser["window"].location.href
-  end
-  
   def source
     browser["window"].document.__original_text__
   end
@@ -285,6 +284,10 @@ class Capybara::Driver::Envjs < Capybara::Driver::Base
   end
 
 private
+
+  def current_url!(url)
+    @current_url = url
+  end
 
   def env
     env = {}
