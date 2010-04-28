@@ -135,6 +135,7 @@ class Capybara::Driver::Envjs < Capybara::Driver::Base
 
   attr_reader :app
   attr_reader :app_host
+  attr_accessor :current_host
 
   def rack_test?
     @rack_test
@@ -214,7 +215,7 @@ class Capybara::Driver::Envjs < Capybara::Driver::Base
 
   def visit(path)
     as_url = URI.parse path
-    base = URI.parse app_host
+    base = URI.parse(current_host || app_host)
     path = (base + as_url).to_s
     browser["window"].location.href = path
   end
